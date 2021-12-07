@@ -20,7 +20,8 @@ object Dependencies {
     "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0",
     "com.typesafe" % "config" % "1.3.2",
     "org.neo4j.driver" % "neo4j-java-driver" % "1.0.4",
-    "net.jcazevedo" %% "moultingyaml" % "0.4.0"
+    "net.jcazevedo" %% "moultingyaml" % "0.4.0",
+    "com.github.javafaker" % "javafaker" % "1.0.2"
   )
 
   val exc = Seq(

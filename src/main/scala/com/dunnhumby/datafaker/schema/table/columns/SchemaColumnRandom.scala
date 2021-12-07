@@ -1,11 +1,12 @@
 
 package com.dunnhumby.datafaker.schema.table.columns
 
-import java.sql.{Date, Timestamp}
 import com.dunnhumby.datafaker.YamlParser.YamlParserProtocol
 import org.apache.spark.sql.Column
-import org.apache.spark.sql.functions.{to_utc_timestamp, round, rand, from_unixtime, to_date}
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{IntegerType, LongType}
+
+import java.sql.{Date, Timestamp}
 
 trait SchemaColumnRandom[T] extends SchemaColumn
 
@@ -14,11 +15,17 @@ object SchemaColumnRandom {
   val DoubleDP = 3
 
   def apply(name: String, min: Int, max: Int): SchemaColumn = SchemaColumnRandomNumeric(name, min, max)
+
   def apply(name: String, min: Long, max: Long): SchemaColumn = SchemaColumnRandomNumeric(name, min, max)
+
   def apply(name: String, min: Float, max: Float): SchemaColumn = SchemaColumnRandomNumeric(name, min, max)
+
   def apply(name: String, min: Double, max: Double): SchemaColumn = SchemaColumnRandomNumeric(name, min, max)
+
   def apply(name: String, min: Date, max: Date): SchemaColumn = SchemaColumnRandomDate(name, min, max)
+
   def apply(name: String, min: Timestamp, max: Timestamp): SchemaColumn = SchemaColumnRandomTimestamp(name, min, max)
+
   def apply(name: String): SchemaColumn = SchemaColumnRandomBoolean(name)
 }
 
@@ -49,11 +56,16 @@ private case class SchemaColumnRandomDate(override val name: String, min: Date, 
   override def column(rowID: Option[Column] = None): Column = to_date(timestamp.column())
 }
 
-private case class SchemaColumnRandomBoolean(override val name: String) extends SchemaColumnRandom[Boolean] {
-  override def column(rowID: Option[Column] = None): Column = rand() < 0.5f
+private case class SchemaColumnRandomBoolean(override val name: String, rate: Double = 0.5) extends SchemaColumnRandom[Boolean] {
+  override def column(rowID: Option[Column] = None): Column = rand() < rate
+}
+
+private case class SchemaColumnRandomFake(override val name: String, fakeExpr: String) extends SchemaColumnRandom[String] {
+  override def column(rowID: Option[Column]): Column = expr(s"fake('${fakeExpr}')")
 }
 
 object SchemaColumnRandomProtocol extends SchemaColumnRandomProtocol
+
 trait SchemaColumnRandomProtocol extends YamlParserProtocol {
 
   import net.jcazevedo.moultingyaml._
@@ -64,25 +76,31 @@ trait SchemaColumnRandomProtocol extends YamlParserProtocol {
       val fields = yaml.asYamlObject.fields
       val YamlString(name) = fields.getOrElse(YamlString("name"), deserializationError("name not set"))
       val YamlString(dataType) = fields.getOrElse(YamlString("data_type"), deserializationError(s"data_type not set for $name"))
+      val maybeFakeExpr = fields.get(YamlString("fake_expression"))
 
-      if (dataType == SchemaColumnDataType.Boolean) {
-        SchemaColumnRandomBoolean(name)
+      maybeFakeExpr match {
+        case Some(YamlString(fakeExpr)) =>
+          SchemaColumnRandomFake(name, fakeExpr)
+        case _ =>
+          if (dataType == SchemaColumnDataType.Boolean) {
+            val rate = fields.getOrElse(YamlString("rate"), YamlString("0.5"))
+            SchemaColumnRandomBoolean(name, rate.convertTo[Double])
+          } else {
+            val min = fields.getOrElse(YamlString("min"), deserializationError(s"min not set for $name"))
+            val max = fields.getOrElse(YamlString("max"), deserializationError(s"max not set for $name"))
+
+            dataType match {
+              case SchemaColumnDataType.Int => SchemaColumnRandomNumeric(name, min.convertTo[Int], max.convertTo[Int])
+              case SchemaColumnDataType.Long => SchemaColumnRandomNumeric(name, min.convertTo[Long], max.convertTo[Long])
+              case SchemaColumnDataType.Float => SchemaColumnRandomNumeric(name, min.convertTo[Float], max.convertTo[Float])
+              case SchemaColumnDataType.Double => SchemaColumnRandomNumeric(name, min.convertTo[Double], max.convertTo[Double])
+              case SchemaColumnDataType.Date => SchemaColumnRandomDate(name, min.convertTo[Date], max.convertTo[Date])
+              case SchemaColumnDataType.Timestamp => SchemaColumnRandomTimestamp(name, min.convertTo[Timestamp], max.convertTo[Timestamp])
+              case _ => deserializationError(s"unsupported data_type: $dataType for ${SchemaColumnType.Random}")
+            }
+          }
+
       }
-      else {
-        val min = fields.getOrElse(YamlString("min"), deserializationError(s"min not set for $name"))
-        val max = fields.getOrElse(YamlString("max"), deserializationError(s"max not set for $name"))
-
-        dataType match {
-          case SchemaColumnDataType.Int => SchemaColumnRandomNumeric(name, min.convertTo[Int], max.convertTo[Int])
-          case SchemaColumnDataType.Long => SchemaColumnRandomNumeric(name, min.convertTo[Long], max.convertTo[Long])
-          case SchemaColumnDataType.Float => SchemaColumnRandomNumeric(name, min.convertTo[Float], max.convertTo[Float])
-          case SchemaColumnDataType.Double => SchemaColumnRandomNumeric(name, min.convertTo[Double], max.convertTo[Double])
-          case SchemaColumnDataType.Date => SchemaColumnRandomDate(name, min.convertTo[Date], max.convertTo[Date])
-          case SchemaColumnDataType.Timestamp => SchemaColumnRandomTimestamp(name, min.convertTo[Timestamp], max.convertTo[Timestamp])
-          case _ => deserializationError(s"unsupported data_type: $dataType for ${SchemaColumnType.Random}")
-        }
-      }
-
     }
 
     override def write(obj: SchemaColumnRandom[_]): YamlValue = ???

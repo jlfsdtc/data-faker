@@ -1,6 +1,8 @@
 
 package com.dunnhumby.datafaker
 
+import com.github.javafaker.Faker
+
 import java.sql.{Date, Timestamp}
 import org.scalatest.{MustMatchers, WordSpec}
 
@@ -20,6 +22,14 @@ class YamlParserTest extends WordSpec with MustMatchers {
       val timestamp = "1998-06-03 01:23:45"
       val string = s"""$timestamp""".stripMargin
       string.parseYaml.convertTo[Timestamp] mustBe Timestamp.valueOf(timestamp)
+    }
+
+    "fake test" in {
+      println(new Faker().expression("#{Country.name}"))
+      println(new Faker().expression("#{Country.name}"))
+      println(new Faker().expression("#{Country.name}"))
+      println(new Faker().expression("#{Country.name}"))
+      1 mustBe 1
     }
   }
 }

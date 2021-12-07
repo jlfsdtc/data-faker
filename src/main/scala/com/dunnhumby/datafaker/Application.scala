@@ -1,6 +1,7 @@
 
 package com.dunnhumby.datafaker
 
+import com.github.javafaker.Faker
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -21,6 +22,8 @@ object Application extends App {
 
   spark.sparkContext.setLogLevel("OFF")
 
+//  val fake = udf((e: String) => new Faker().expression(e))
+  spark.udf.register("fake", (e: String) => new Faker().expression(e))
   spark.sql(s"create database if not exists ${parsedArgs("database")}")
 
   val schema = YamlParser.parseSchemaFromFile(parsedArgs("file"))

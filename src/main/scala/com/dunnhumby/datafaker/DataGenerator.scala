@@ -10,7 +10,7 @@ class DataGenerator(spark: SparkSession, database: String) extends Serializable 
   private val logger = Logger.getLogger(getClass)
   logger.setLevel(Level.INFO)
 
-  def generateAndWriteDataFromSchema(schema: Schema) {
+  def generateAndWriteDataFromSchema(schema: Schema): Unit = {
     for (table <- schema.tables) {
       logger.info(s"generating and writing ${table.rows} rows for ${table.name}")
 
