@@ -1,10 +1,7 @@
 
 package com.dunnhumby.datafaker
 
-import java.io.File
-import com.holdenkarau.spark.testing.LocalSparkContext
 import org.apache.spark.sql.SparkSession
-import org.scalatest.{BeforeAndAfterAll, Suite}
 
 
 trait SharedSparkSession {

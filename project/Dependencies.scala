@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
 
   object Version {
-    val spark = "2.1.0"
+    val spark = "2.4.5"
     val scalaTest = "3.0.4"
   }
 
@@ -12,9 +12,10 @@ object Dependencies {
     "org.apache.spark" %% "spark-hive" % Version.spark % Provided,
     "org.apache.spark" %% "spark-mllib" % Version.spark % Provided,
     "org.apache.spark" %% "spark-sql" % Version.spark % Provided,
+    "org.apache.hadoop" % "hadoop-aws" % "2.8.0" % Test,
     "org.scalatest" %% "scalatest" % Version.scalaTest % Test,
     "org.scalamock" %% "scalamock" % "4.1.0" % Test,
-    "com.holdenkarau" %% "spark-testing-base" % s"${Version.spark}_0.8.0" % Test,
+//    "com.holdenkarau" %% "spark-testing-base" % s"${Version.spark}_1.1.1" % Test,
     "ch.qos.logback" % "logback-core" % "1.2.3",
     "ch.qos.logback" % "logback-classic" % "1.2.3",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0",

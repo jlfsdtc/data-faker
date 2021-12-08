@@ -25,10 +25,10 @@ class YamlParserTest extends WordSpec with MustMatchers {
     }
 
     "fake test" in {
-      println(new Faker().expression("#{Country.name}"))
-      println(new Faker().expression("#{Country.name}"))
-      println(new Faker().expression("#{Country.name}"))
-      println(new Faker().expression("#{Country.name}"))
+      println(new Faker().expression("#{Address.city_name}"))
+      println(new Faker().expression("#{Address.state}"))
+      println(new Faker().expression("#{Address.country_code}"))
+      println(new Faker().expression("#{Address.full_address}"))
       1 mustBe 1
     }
   }

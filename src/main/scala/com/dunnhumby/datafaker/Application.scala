@@ -22,8 +22,10 @@ object Application extends App {
 
   spark.sparkContext.setLogLevel("OFF")
 
-//  val fake = udf((e: String) => new Faker().expression(e))
-  spark.udf.register("fake", (e: String) => new Faker().expression(e))
+//  val sharedFaker = SharedVariable(new Faker())
+  spark.udf.register("fake", (e: String) => {
+    Singletons.faker.expression(e)
+  })
   spark.sql(s"create database if not exists ${parsedArgs("database")}")
 
   val schema = YamlParser.parseSchemaFromFile(parsedArgs("file"))

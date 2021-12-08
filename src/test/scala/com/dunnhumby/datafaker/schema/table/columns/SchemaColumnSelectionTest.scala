@@ -1,8 +1,11 @@
 
 package com.dunnhumby.datafaker.schema.table.columns
 
+import com.dunnhumby.datafaker.Application.spark
+
 import java.sql.{Date, Timestamp}
-import com.dunnhumby.datafaker.{SharedSparkSession}
+import com.dunnhumby.datafaker.{SharedSparkSession, SharedVariable, Singletons}
+import com.github.javafaker.Faker
 import org.scalatest.{Inspectors, MustMatchers, WordSpec}
 
 class SchemaColumnSelectionTest extends WordSpec with SharedSparkSession with MustMatchers with Inspectors {
@@ -119,6 +122,17 @@ class SchemaColumnSelectionTest extends WordSpec with SharedSparkSession with Mu
 
       val testData = dataFrame.select("Selection").collect().map(_.getInt(0))
       testData must contain only (list:_*)
+    }
+
+    "try udf" in {
+      val sharedFaker = SharedVariable(new Faker())
+      spark.udf.register("fake", (e: String) => {
+        Singletons.faker.expression(e)
+      })
+      spark.sql("select fake('#{Address.city_name}')").show()
+      spark.sql("select fake('#{Address.city_name}')").show()
+      spark.sql("select fake('#{Address.city_name}')").show()
+      spark.sql("select fake('#{Address.city_name}')").show()
     }
   }
 }
