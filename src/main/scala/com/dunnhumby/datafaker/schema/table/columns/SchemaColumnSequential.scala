@@ -4,7 +4,8 @@ package com.dunnhumby.datafaker.schema.table.columns
 import java.sql.{Date, Timestamp}
 import com.dunnhumby.datafaker.YamlParser.YamlParserProtocol
 import org.apache.spark.sql.Column
-import org.apache.spark.sql.functions.{to_utc_timestamp, from_unixtime, monotonically_increasing_id, to_date}
+import org.apache.spark.sql.functions.{from_unixtime, monotonically_increasing_id, to_date, to_utc_timestamp}
+import org.apache.spark.sql.types.DataType
 
 trait SchemaColumnSequential[T] extends SchemaColumn
 
@@ -17,8 +18,11 @@ object SchemaColumnSequential {
   def apply(name: String, start: Timestamp, step: Int): SchemaColumn = SchemaColumnSequentialTimestamp(name, start, step)
 }
 
-private case class SchemaColumnSequentialNumeric[T: Numeric](override val name: String, start: T, step: T) extends SchemaColumnSequential[T] {
-  override def column(rowID: Option[Column] = Some(monotonically_increasing_id)): Column = (rowID.get * step) + start
+private case class SchemaColumnSequentialNumeric[T: Numeric](override val name: String, start: T, step: T, cast: Option[DataType] = None) extends SchemaColumnSequential[T] {
+  override def column(rowID: Option[Column] = Some(monotonically_increasing_id)): Column = {
+    val col = (rowID.get * step) + start
+    cast.map(col.cast).getOrElse(col)
+  }
 }
 
 private case class SchemaColumnSequentialTimestamp(override val name: String, start: Timestamp, stepSeconds: Int) extends SchemaColumnSequential[Timestamp] {
@@ -48,11 +52,16 @@ trait SchemaColumnSequentialProtocol extends YamlParserProtocol {
       val start = fields.getOrElse(YamlString("start"), deserializationError("start not set"))
       val step = fields.getOrElse(YamlString("step"), deserializationError("step not set"))
 
+      val maybeCast = fields.get(YamlString("cast")) match {
+        case Some(YamlString(dType)) => Some(DataType.fromDDL(dType))
+        case _ => None
+      }
+
       dataType match {
-        case "Int" => SchemaColumnSequentialNumeric(name, start.convertTo[Int], step.convertTo[Int])
-        case "Long" => SchemaColumnSequentialNumeric(name, start.convertTo[Long], step.convertTo[Long])
-        case "Float" => SchemaColumnSequentialNumeric(name, start.convertTo[Float], step.convertTo[Float])
-        case "Double" => SchemaColumnSequentialNumeric(name, start.convertTo[Double], step.convertTo[Double])
+        case "Int" => SchemaColumnSequentialNumeric(name, start.convertTo[Int], step.convertTo[Int], maybeCast)
+        case "Long" => SchemaColumnSequentialNumeric(name, start.convertTo[Long], step.convertTo[Long], maybeCast)
+        case "Float" => SchemaColumnSequentialNumeric(name, start.convertTo[Float], step.convertTo[Float], maybeCast)
+        case "Double" => SchemaColumnSequentialNumeric(name, start.convertTo[Double], step.convertTo[Double], maybeCast)
         case "Date" => SchemaColumnSequentialDate(name, start.convertTo[Date], step.convertTo[Int])
         case "Timestamp" => SchemaColumnSequentialTimestamp(name, start.convertTo[Timestamp], step.convertTo[Int])
         case _ => deserializationError(s"unsupported data_type: $dataType for ${SchemaColumnType.Sequential}")

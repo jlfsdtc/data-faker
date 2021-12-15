@@ -6,6 +6,7 @@ import com.dunnhumby.datafaker.Application.spark
 import java.sql.{Date, Timestamp}
 import com.dunnhumby.datafaker.{SharedSparkSession, SharedVariable, Singletons}
 import com.github.javafaker.Faker
+import org.apache.spark.sql.types.DataType
 import org.scalatest.{Inspectors, MustMatchers, WordSpec}
 
 class SchemaColumnSelectionTest extends WordSpec with SharedSparkSession with MustMatchers with Inspectors {
@@ -114,6 +115,7 @@ class SchemaColumnSelectionTest extends WordSpec with SharedSparkSession with Mu
     }
 
     "select a random value from the given list of values" in {
+      val dType = DataType.fromDDL("decimal(38,10)")
       val list = List(1, 2, 3, 4, 5, 6)
 
       val dataFrame = spark.range(1000).toDF("temp")

@@ -3,6 +3,7 @@ package com.dunnhumby.datafaker.schema.table.columns
 
 import com.dunnhumby.datafaker.YamlParser.YamlParserProtocol
 import org.apache.spark.sql.Column
+import org.apache.spark.sql.types.DataType
 
 abstract class SchemaColumn {
   def name: String
