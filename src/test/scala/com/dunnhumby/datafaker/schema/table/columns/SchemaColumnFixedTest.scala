@@ -25,7 +25,7 @@ class SchemaColumnFixedTest extends WordSpec with MustMatchers {
            |value: 1
          """.stripMargin
 
-      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, 1)
+      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, 1, None)
     }
 
     "read a Long column" in {
@@ -35,7 +35,7 @@ class SchemaColumnFixedTest extends WordSpec with MustMatchers {
            |value: 1
          """.stripMargin
 
-      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, 1l)
+      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, 1l, None)
     }
 
     "read a Float column" in {
@@ -45,7 +45,7 @@ class SchemaColumnFixedTest extends WordSpec with MustMatchers {
            |value: 1.0
          """.stripMargin
 
-      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, 1f)
+      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, 1f, None)
     }
 
     "read a Double column" in {
@@ -55,7 +55,7 @@ class SchemaColumnFixedTest extends WordSpec with MustMatchers {
            |value: 1.0
          """.stripMargin
 
-      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, 1d)
+      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, 1d, None)
     }
 
     "read a Date column" in {
@@ -65,7 +65,7 @@ class SchemaColumnFixedTest extends WordSpec with MustMatchers {
            |value: 1998-06-03
          """.stripMargin
 
-      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, Date.valueOf("1998-06-03"))
+      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, Date.valueOf("1998-06-03"), None)
     }
 
     "read a Timestamp column" in {
@@ -75,7 +75,7 @@ class SchemaColumnFixedTest extends WordSpec with MustMatchers {
            |value: 1998-06-03 01:23:45
          """.stripMargin
 
-      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, Timestamp.valueOf("1998-06-03 01:23:45"))
+      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, Timestamp.valueOf("1998-06-03 01:23:45"), None)
     }
 
     "read a String column" in {
@@ -85,7 +85,7 @@ class SchemaColumnFixedTest extends WordSpec with MustMatchers {
            |value: test
          """.stripMargin
 
-      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, "test")
+      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, "test", None)
     }
 
     "read a Boolean column" in {
@@ -95,7 +95,7 @@ class SchemaColumnFixedTest extends WordSpec with MustMatchers {
            |value: true
          """.stripMargin
 
-      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, true)
+      string.parseYaml.convertTo[SchemaColumnFixed[_]] mustBe SchemaColumnFixed(name, true, None)
     }
   }
 }

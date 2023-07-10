@@ -36,9 +36,9 @@ class SchemaTest extends WordSpec with MustMatchers {
       string.parseYaml.convertTo[Schema] mustBe {
         Schema(List(
            SchemaTable("table1_test", 100, List(
-             SchemaColumnFixed("table1_column1_test", 1)), None),
+             SchemaColumnFixed("table1_column1_test", 1, None)), None),
            SchemaTable("table2_test", 200, List(
-             SchemaColumnFixed("table2_column1_test", "testing")), Some(List("table2_column1_test")))))
+             SchemaColumnFixed("table2_column1_test", "testing", None)), Some(List("table2_column1_test")))))
       }
     }
   }

@@ -22,7 +22,7 @@ class SchemaTableTest extends WordSpec with MustMatchers {
   "SchemaTable" must {
     "read a Table with columns" in {
       val string = baseString
-      string.parseYaml.convertTo[SchemaTable] mustBe SchemaTable("test", 10, List(SchemaColumnFixed("test_column", 1)), None)
+      string.parseYaml.convertTo[SchemaTable] mustBe SchemaTable("test", 10, List(SchemaColumnFixed("test_column", 1, None)), None)
     }
 
     "read a Table with columns and partitions" in {
@@ -31,7 +31,7 @@ class SchemaTableTest extends WordSpec with MustMatchers {
            |partitions:
            |- test_column
          """.stripMargin
-      string.parseYaml.convertTo[SchemaTable] mustBe SchemaTable("test", 10, List(SchemaColumnFixed("test_column", 1)), Some(List("test_column")))
+      string.parseYaml.convertTo[SchemaTable] mustBe SchemaTable("test", 10, List(SchemaColumnFixed("test_column", 1, None)), Some(List("test_column")))
     }
 
     "read a Table with columns and no partitions" in {
@@ -39,7 +39,7 @@ class SchemaTableTest extends WordSpec with MustMatchers {
         s"""$baseString
            |partitions:
          """.stripMargin
-      string.parseYaml.convertTo[SchemaTable] mustBe SchemaTable("test", 10, List(SchemaColumnFixed("test_column", 1)), None)
+      string.parseYaml.convertTo[SchemaTable] mustBe SchemaTable("test", 10, List(SchemaColumnFixed("test_column", 1, None)), None)
     }
   }
 }
