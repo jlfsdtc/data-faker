@@ -8,7 +8,7 @@
     <name>datafaker</name>
     <properties>
         <scala.version>2.12.15</scala.version>
-        <spark.version>3.2.0-kylin-4.6.12.0-SNAPSHOT</spark.version>
+        <spark.version>3.3.0-kylin-4.6.18.0</spark.version>
         <scalatest.version>3.0.4</scalatest.version>
         <logback.version>1.2.3</logback.version>
         <argLine>-Xms2G -Xmx8G</argLine>
